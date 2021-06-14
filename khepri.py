@@ -19,12 +19,15 @@ Steps:
 """
 from pprint import pprint as print
 import docker
+import os
 
 client = docker.from_env()
 # target list can be left empty, as "running", or select explicit container names or short_ids... long IDs might also work.
+
 target_containers = [
         "pihole05",
         ]
+backup_path = "/home/javier/backups"
 
 def name_2_id(container_name):
     """
@@ -53,10 +56,25 @@ else:
         except:
             print("Container not found. Skipping.")
             pass
-
     target_containers = target_containers2   
 
 print(target_containers)
+
+# Function to complete the backup
+
+def backup(container, ):
+    """
+    Runs container that attaches to volumes from target_containers and backs them up locally
+    docker run --rm --volumes-from dbstore -v $(pwd):/backup ubuntu tar cvf /backup/backup.tar /dbdata
+    """
+    pwd = os.getcwd()
+    client.containers.run(
+            'alpine',
+            remove=True,
+            volumes_from=[container],
+            volumes={pwd: {'bind':'/backup', 'mode': 'rw'}},
+            command=["tar", "cvf", "/backup/backup1.tar", "/vol_name"]
+            )
 
 #Loop through each container and find any attached volumes
 for containers in target_containers:
@@ -66,3 +84,7 @@ for containers in target_containers:
         volume_dir = x["Destination"]
         print(volume_name)
         print(volume_dir)
+
+
+
+
