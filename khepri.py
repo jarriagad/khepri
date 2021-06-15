@@ -15,7 +15,6 @@ Steps:
     2. Identify backup storage location
     3. Incremental changes only using rsync or something
     4. clean up after itself
-
 """
 from pprint import pprint as print
 import docker
@@ -27,15 +26,6 @@ client = docker.from_env()
 target_containers = [
         "pihole05",
         ]
-backup_path = "/home/javier/backups"
-
-def name_2_id(container_name):
-    """
-    Turns container name into container short_ID
-    """
-    container_id = client.containers.get(container_name).short_id
-    return container_id
-
 
 # Parses provided list for special keywords, or container names
 if not target_containers:
@@ -58,24 +48,6 @@ else:
             pass
     target_containers = target_containers2   
 
-print(target_containers)
-
-# Function to complete the backup
-
-def backup(container, ):
-    """
-    Runs container that attaches to volumes from target_containers and backs them up locally
-    docker run --rm --volumes-from dbstore -v $(pwd):/backup ubuntu tar cvf /backup/backup.tar /dbdata
-    """
-    pwd = os.getcwd()
-    client.containers.run(
-            'alpine',
-            remove=True,
-            volumes_from=[container],
-            volumes={pwd: {'bind':'/backup', 'mode': 'rw'}},
-            command=["tar", "cvf", "/backup/backup1.tar", "/vol_name"]
-            )
-
 #Loop through each container and find any attached volumes
 for containers in target_containers:
     mounts = containers.attrs.get("Mounts")
@@ -84,6 +56,26 @@ for containers in target_containers:
         volume_dir = x["Destination"]
         print(volume_name)
         print(volume_dir)
+
+# Function to complete the backup
+def backup(container, volume_dir):
+    """
+    Runs container that attaches to volumes from target_containers and backs them up locally
+    docker run --rm --volumes-from dbstore -v $(pwd):/backup ubuntu tar cvf /backup/backup.tar /dbdata
+    """
+    pwd = os.getcwd()
+    volume_list = [container]
+    command_list = ["tar", "cvf", "/backup/backup1.tar", volume_dir]
+    client.containers.run(
+            'alpine',
+            name="Backerup02",
+            volumes_from=["plex02"],
+            volumes={"/home/javier/": {'bind':'/backup', 'mode': 'rw'}},
+            command=["tar", "cvf", "/backup/backup2.tar", "/config"]
+            )
+
+backup("plex02", "/config")
+
 
 
 
