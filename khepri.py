@@ -27,7 +27,7 @@ target_containers = [
         "pihole05",
         ]
 
-# Parses provided list for special keywords, or container names
+# Parses provided list for special keywords, or container names, returns list of all real selected containers target_containers 
 if not target_containers:
     print("No explicitly listed containers to back up.")
     print("Backing up all containers...")
@@ -37,16 +37,16 @@ elif "running" in target_containers:
     target_containers = client.containers.list(all="True", filters={"status":"running"})
 else:
     print("Custom list: Checking containers...   ")
-    target_containers2 = []
+    target_containers_temp = []
     for i in target_containers:
         print("Trying: %s" % (i))
         try:
-            target_containers2.append(client.containers.get(i))
+            target_containers_temp.append(client.containers.get(i))
             print("OK.")
         except:
             print("Container not found. Skipping.")
             pass
-    target_containers = target_containers2   
+    target_containers = target_containers_temp
 
 #Loop through each container and find any attached volumes
 for containers in target_containers:
