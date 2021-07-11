@@ -6,16 +6,20 @@
 
 Khepri uses the Docker python SDK to find desired containers / volumes and back them up to a specified directory.
 
-How-to:
+How-to: (Current usage for *develop* branch)
 
-First, make sure that you have edited the .env file to your liking.
-If .env is left as default, or not existant, Khepri will back up all volumes found in the node that it is running on.
+By default, Khepri will try to back up all containers as it is impartial to container status
+If you would like to backup select containers, edit the list named `target_containers` and include all containers you want backed up
 
-`vim .env`
+By default, the script stored the backups in the directory that it was executed from.
+To change this, change the variable `custom_backup_path` to a desired path.
+IE: `custom_backup_path = "/path/to/backup"`
 
-`./khepri.py`
+Once config has been set, initiate script with:
+`./khepri`
 
 
 TODO:
 - Implement config / .env file
-- Fix backup() function
+- Fix stdout
+- Fix timestamp feature
