@@ -9,13 +9,6 @@ Version: 0.1.0
 Description: Tool to assit with back up of docker containers
 """
 
-"""
-Steps:
-    1. Identify volumes to back up
-    2. Identify backup storage location
-    3. Incremental changes only using rsync or something
-    4. clean up after itself
-"""
 import os
 import docker
 from functions import createBackupDir, backupContainer
@@ -26,6 +19,8 @@ from pprint import pprint as print
 # target list can be left empty, as "running", or select explicit container names or short_ids... long IDs might also work.
 target_containers = [
         ]
+
+custom_backup_path = False
 """"""
 
 client = docker.from_env()
@@ -55,7 +50,7 @@ else:
 for container in target_containers:
     mounts = container.attrs.get("Mounts")
     target_container_name = container.name
-    full_path = createBackupDir(target_container_name)
+    full_path = createBackupDir(target_container_name, custom_backup_path)
     print(full_path)
     for x in mounts:
         try:
