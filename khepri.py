@@ -18,7 +18,7 @@ Steps:
 """
 import os
 import docker
-from test_khe import createBackupDir, backupContainer
+from functions import createBackupDir, backupContainer
 
 """ For Testing """
 from pprint import pprint as print
@@ -29,8 +29,6 @@ target_containers = [
 """"""
 
 client = docker.from_env()
-
-
 
 # Sanitizes list and returns list of container objects
 if not target_containers:
@@ -60,38 +58,11 @@ for container in target_containers:
     full_path = createBackupDir(target_container_name)
     print(full_path)
     for x in mounts:
-        volume_name = x["Name"]
-        volume_dir = x["Destination"]
+        try:
+            volume_name = x["Name"]
+            volume_dir = x["Destination"]
+        except:
+            exit(99)
+        print("Backing up " + target_container_name + ":" + volume_dir)
         backupContainer(target_container_name, volume_name, volume_dir, full_path)
-
-# Function to complete the backup
-def backup(container, volume_dir):
-    #Runs container that attaches to volumes from target_containers and backs them up locally - (to working directory)
-    #docker run --rm --volumes-from <container-to-be-backedup> -v $(pwd):/backup alpine tar cvf /backup/backup.tar /dbdata
-    pwd = os.getcwd()
-    volume_list = [container]
-    command_list = ["tar", "cvf", "/backup/backup1.tar", volume_dir]
-    client.containers.run(
-            'alpine',
-            name="Backerup02",
-            volumes_from=["plex02"],
-            volumes={"/home/javier/": {'bind':'/backup', 'mode': 'rw'}},
-            command=["tar", "cvf", "/backup/backup2.tar", "/config"]
-            )
-
-
-
-def backup_test(container, external_backup_dir):
-    container_name = "bu-" + container
-    internal_backup_dir = "/backup/backup.tar"
-    command_list = ["tar", "cvf", internal_backup_dir, external_backup_dir]
-    client.containers.run(
-            'alpine',
-            name=container_name,
-            volumes_from=[container],
-            volumes={pwd: {'bind':'/backup', 'mode': 'rw'}},
-            command=command_list,
-            )
-
-
 
