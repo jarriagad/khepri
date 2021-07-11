@@ -16,17 +16,21 @@ Steps:
     3. Incremental changes only using rsync or something
     4. clean up after itself
 """
-from test_khe import createBackupDir
-from pprint import pprint as print
-import docker
 import os
+import docker
+from test_khe import createBackupDir, backupContainer
 
+""" For Testing """
+from pprint import pprint as print
 
-client = docker.from_env()
 # target list can be left empty, as "running", or select explicit container names or short_ids... long IDs might also work.
-
 target_containers = [
         ]
+""""""
+
+client = docker.from_env()
+
+
 
 # Sanitizes list and returns list of container objects
 if not target_containers:
@@ -53,13 +57,12 @@ else:
 for container in target_containers:
     mounts = container.attrs.get("Mounts")
     target_container_name = container.name
-    createBackupDir(target_container_name)
+    full_path = createBackupDir(target_container_name)
+    print(full_path)
     for x in mounts:
         volume_name = x["Name"]
         volume_dir = x["Destination"]
-#        print(target_container_name)
-#        print(volume_name)
-#        print(volume_dir)
+        backupContainer(target_container_name, volume_name, volume_dir, full_path)
 
 # Function to complete the backup
 def backup(container, volume_dir):
