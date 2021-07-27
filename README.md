@@ -20,7 +20,7 @@ Once config has been set, initiate script with:
 `./khepri`
 
 CLI parameter flags:
-- -l --> Used to list spcified containers along with which volumes are attached.
+- `-l` --> Used to list spcified containers along with which volumes are attached.
 
 TODO:
 - Implement config / .env file
