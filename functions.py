@@ -8,13 +8,33 @@ import docker
 import os
 
 
+def sanitizeContainerList(target_containers):
+    # Sanitizes list and returns list of container objects
+    if not target_containers:
+        message = "No explicitly listed containers to back up. \nBacking up all containers..."
+        target_containers = client.containers.list(all="True")
+    elif "running" in target_containers:
+        message = "Selecing RUNNING containers:"
+        target_containers = client.containers.list(all="True", filters={"status":"running"})
+    else:
+        message = "Custom list: Checking containers...   "
+        target_containers_temp = []
+        for i in target_containers:
+            try:
+                target_containers_temp.append(client.containers.get(i))
+            except:
+                print("Container {0} not found. Skipping.".format(i))
+                pass
+        target_containers = target_containers_temp
+    return target_containers
+
+
 
 def createBackupDir(target_container, local_backup_path=False):
     """
     Checks for a specified back up path, if no path cwd is used.
     Checks for a directory to save backup to, if none one is created
     """
-
     pwd = os.getcwd()
     backup_dir = target_container + "_backups"
     # Check if local path is set
@@ -61,6 +81,17 @@ def backupContainer(target_container_name, volume_name, volume_dir, full_dir):
             auto_remove=True,
             remove=True,
             )
+
+
+def getVolumeList(target_containers_list):
+    #Purpose is to have a "-l" flag that only prints the found volumes.
+    for container in target_containers_list:
+        mounts = container.attrs.get("Mounts")
+        target_container_name = container.name
+        print("Container: " + target_container_name)
+        for vol in mounts:
+            print("  Volume: " + vol['Name'])
+            print("  Source: " + vol['Source'])
 
 
 

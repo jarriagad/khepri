@@ -9,42 +9,34 @@ Version: 0.1.0
 Description: Tool to assit with back up of docker containers
 """
 
+import sys
 import docker
-from functions import createBackupDir, backupContainer
+from functions import createBackupDir, backupContainer, getVolumeList, sanitizeContainerList
 
 """ For Testing """
-from pprint import pprint as print
+#from pprint import pprint as print
 
-# target list can be left empty, as "running", or select explicit container names or short_ids... long IDs might also work.
+
 
 """"""
 def main():
+    # target list can be left empty, as "running", or select explicit container names or short_ids... long IDs might also work.
     target_containers = [
         "pihole05"
         ]
     client = docker.from_env()
     custom_backup_path = False
 
-    # Sanitizes list and returns list of container objects
-    if not target_containers:
-        print("No explicitly listed containers to back up.")
-        print("Backing up all containers...")
-        target_containers = client.containers.list(all="True")
-    elif "running" in target_containers:
-        print("Selecing RUNNING containers:")
-        target_containers = client.containers.list(all="True", filters={"status":"running"})
+    #Function returns list of workable container IDs 
+    target_containers = sanitizeContainerList(target_containers)
+
+    #This following section will be used to construct the CLI flags allowed
+    # Flag 1. "-l" lists selected containers in "target_container" list and displays attached volumes
+    if sys.argv[-1] == "-l":
+        getVolumeList(target_containers)
+        exit(0)
     else:
-        print("Custom list: Checking containers...   ")
-        target_containers_temp = []
-        for i in target_containers:
-            print("Trying: %s" % (i))
-            try:
-                target_containers_temp.append(client.containers.get(i))
-                print("OK.")
-            except:
-                print("Container not found. Skipping.")
-                pass
-        target_containers = target_containers_temp
+        pass
 
     #Loop through each container and find any attached volumes
     for container in target_containers:
