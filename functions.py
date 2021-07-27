@@ -31,12 +31,13 @@ def createBackupDir(target_container, local_backup_path=False):
 
     return full_path
 
-def getRandomString(length):
+def getRandomString(length, name_prefix = "khe-worker"):
     """
-    Generates random string
+    Generates name + random string
     """
     letters = string.ascii_lowercase
-    result_str = ''.join(random.choice(letters) for i in range(length))
+    random_str = ''.join(random.choice(letters) for i in range(length))
+    result_str = name_prefix + "-" + random_str
     return result_str
 
 """
@@ -45,10 +46,10 @@ docker run --rm --volumes-from <target_container> -v <full_backup_path>:/backup 
 
 client = docker.from_env()
 def backupContainer(target_container_name, volume_name, volume_dir, full_dir):
-    worker_container_name = "khe-worker-" + getRandomString(5)
+    worker_container_name = getRandomString(5)
     my_date = datetime.now()
     timestamp = my_date.strftime('%Y-%m-%D_%H-%M-%S')
-    internal_backup_dir = "/backup/" + target_container_name + "_" + volume_name + ".bak"
+    internal_backup_dir = "/backup/" + target_container_name + "_" + volume_name + ".bak.tar"
     command_list = ["tar", "cvf", internal_backup_dir, volume_dir]
     client.containers.run(
             'alpine',
