@@ -72,7 +72,7 @@ def backupContainer(target_container_name, volume_name, volume_dir, full_dir):
     internal_backup_dir = "/backup/" + target_container_name + "_" + volume_name + ".bak.tar"
     command_list = ["tar", "cvf", internal_backup_dir, volume_dir]
     client.containers.run(
-            'alpine',
+            'jarriagada/alpine-sync',
             name=worker_container_name,
             volumes_from=[target_container_name],
             volumes={full_dir: {'bind':'/backup', 'mode': 'rw'}},
