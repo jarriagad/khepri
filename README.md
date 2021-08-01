@@ -26,7 +26,7 @@ Script must be run by user in docker group.
 CLI parameter flags:
 - `-l` --> Used to list specified containers along with attached volumes.
 - `-h` --> Used to show help page.
-- `-t' --> Creates a tarball for each volume that is backed up.
+- `-t` --> Creates a tarball for each volume that is backed up.
 - `-tz` --> Creates a compressed tarball for each volume.
 - `-s` or `-sync` --> Incremental backups of volumes. This is also the fastes option. 
 
