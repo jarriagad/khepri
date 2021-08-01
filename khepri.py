@@ -11,7 +11,7 @@ Description: Tool to assit with back up of docker containers
 
 import sys
 import docker
-from functions import createBackupDir, backupContainer, getVolumeList, sanitizeContainerList, getImage
+from functions import createBackupDir, backupContainer, getVolumeList, sanitizeContainerList, getImage, fixTroubleChild
 
 def main():
     # target list can be left empty, as "running", or select explicit container names or short_ids... long IDs might also work.
@@ -67,9 +67,13 @@ def main():
         full_path = createBackupDir(target_container_name, custom_backup_path)
         for x in mounts:
             try:
-                volume_name = x["Name"]
+                try:
+                    volume_name = x["Name"]
+                except:
+                    volume_name = fixTroubleChild(x["Source"])
                 volume_dir = x["Destination"]
             except:
+                print("Failure: Issue finding volume attributes")
                 exit(99)
             print("Backing up " + target_container_name + ":" + volume_dir)
             backupContainer(target_container_name, volume_name, volume_dir, full_path, sys.argv[1])

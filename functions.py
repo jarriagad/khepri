@@ -102,6 +102,10 @@ def backupContainer(target_container_name, volume_name, volume_dir, full_dir, co
             remove=True,
             )
 
+def fixTroubleChild(input_path):
+    last_path_item = os.path.basename(os.path.normpath('input_path'))
+    return last_path_item
+
 
 def getVolumeList(target_containers_list):
     #Purpose is to have a "-l" flag that only prints the found volumes.
@@ -110,7 +114,10 @@ def getVolumeList(target_containers_list):
         target_container_name = container.name
         print("Container: " + target_container_name)
         for vol in mounts:
-            print("  Volume: " + vol['Name'])
+            try:
+                print("  Volume: " + vol['Name'])
+            except:
+                print("  Volume: " + fixTroubleChild(vol['Source']))
             print("  Source: " + vol['Source'])
 
 
