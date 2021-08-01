@@ -65,14 +65,34 @@ docker run --rm --volumes-from <target_container> -v <full_backup_path>:/backup 
 """
 
 client = docker.from_env()
-def backupContainer(target_container_name, volume_name, volume_dir, full_dir):
+def getImage():
+    try:
+        client.images.pull("jarriagada/alpine-sync:latest")
+        image = None
+    except:
+        image = "Failure downloading image"
+        exit(99)
+    return image
+
+def backupContainer(target_container_name, volume_name, volume_dir, full_dir, command_flag):
     worker_container_name = getRandomString(5)
     my_date = datetime.now()
     timestamp = my_date.strftime('%Y-%m-%D_%H-%M-%S')
-    internal_backup_dir = "/backup/" + target_container_name + "_" + volume_name + ".bak.tar"
-    command_list = ["tar", "cvf", internal_backup_dir, volume_dir]
+
+    #Create if then list for different commands
+    #Tar command
+    if command_flag == "-t":
+        internal_backup_dir = "/backup/" + target_container_name + "_" + volume_name + ".bak.tar"
+        command_list = ["tar", "cf", internal_backup_dir, volume_dir]
+    elif command_flag == "-tz":
+        internal_backup_dir = "/backup/" + target_container_name + "_" + volume_name + ".bak.tar.xz"
+        command_list = ["tar", "cfJ", internal_backup_dir, volume_dir]
+    elif command_flag == "-sync" or command_flag == "-s":
+        internal_backup_dir = "/backup/" + target_container_name + "_" + volume_name
+        command_list = ["rsync", "-a", volume_dir, internal_backup_dir]
+
     client.containers.run(
-            'jarriagada/alpine-sync',
+            'jarriagada/alpine-sync:latest',
             name=worker_container_name,
             volumes_from=[target_container_name],
             volumes={full_dir: {'bind':'/backup', 'mode': 'rw'}},
