@@ -41,5 +41,3 @@ Dependencies:
 - Docker SDK
 - jarriagada/alpine-sync (will be downloaded automatically if not available)
 
-TODO:
-- Fix timestamp feature

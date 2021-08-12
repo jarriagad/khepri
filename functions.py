@@ -76,9 +76,6 @@ def getImage():
 
 def backupContainer(target_container_name, volume_name, volume_dir, full_dir, command_flag):
     worker_container_name = getRandomString(5)
-    my_date = datetime.now()
-    timestamp = my_date.strftime('%Y-%m-%D_%H-%M-%S')
-
     #Create if then list for different commands
     #Tar command
     if command_flag == "-t":

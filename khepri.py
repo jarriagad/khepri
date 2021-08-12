@@ -5,7 +5,7 @@ Script: khepri.py
 Usage: ./khepri.py
 Author: Javier Arriagada
 Created: 6/13/2021
-Version: 0.1.0
+Version: 1.1.0
 Description: Tool to assit with back up of docker containers
 """
 
