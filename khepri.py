@@ -15,7 +15,7 @@ from functions import createBackupDir, backupContainer, getVolumeList, sanitizeC
 
 def main():
     # target list can be left empty, as "running", or select explicit container names or short_ids... long IDs might also work.
-    target_containers = []
+    target_containers = ["running"]
     #Custom backup path is set here!
     custom_backup_path = False
 
