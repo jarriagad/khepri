@@ -4,7 +4,7 @@
 
 ## Script to automate backup of docker volumes
 
-![](khepri_demo_final.gif)
+![](demo_khepri.gif)
 
 Khepri uses the Docker python SDK to find desired containers / volumes and back them up to a specified directory.
 
